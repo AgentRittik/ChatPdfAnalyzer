@@ -3,10 +3,13 @@ import {Button} from "@/components/ui/button"
 import { UserButton ,auth} from '@clerk/nextjs'
 import Link from 'next/link';
 import { LogIn} from 'lucide-react'
+import FileUpload from '@/components/FileUpload'
 export default async function Home() {
   //auth is function from ClerkAuth
   const {userId} = await auth();// this will return the user id of the current user if he will be signed in ->ans type is String
   //other wise it is empty
+  console.log(userId);
+  
   const isAuth = !!userId
 
   return(
@@ -24,7 +27,9 @@ export default async function Home() {
           <p className='max-w-xl mt-1 text-lg text-slate-600'>Join millions of students, researchers and professionals to instantly answer questions and understand research with AI</p>
           
           <div className='w-full mt-4'>
-            {isAuth ? (<h1>fieupload</h1>) : (
+            {isAuth ? (
+              <FileUpload></FileUpload>
+            ) : (
               <Link href="/sign-in">
                 <Button>Login to get Started
                   <LogIn className='w-4 h-4 ml-2'></LogIn>
