@@ -1,7 +1,7 @@
 import type { Config } from 'drizzle-kit';
 import * as dotenv from 'dotenv';
 dotenv.config({path: '.env'});
-// console.log("hello" , process.env.DATABASE_URL);
+console.log("hello" , process.env.DATABASE_URL);
 
 export default {
     driver : 'pg',
