@@ -1,11 +1,12 @@
-import {Pinecone , Vector} from '@pinecone-database/pinecone'
+import {Pinecone , PineconeRecord} from '@pinecone-database/pinecone'
 import { log } from 'console';
-import { downlaodFromS3 } from './s3-server';
+import { downloadFromS3 } from './s3-server';
 import {PDFLoader} from 'langchain/document_loaders/fs/pdf';
 import md5 from 'md5';
 import { Document  , RecursiveCharacterTextSplitter} from '@pinecone-database/doc-splitter';
 import { getEmbeddings } from './embeddings';
-
+import { convertToAscii } from './utils';
+import { name } from 'drizzle-orm';
 let pinecone : Pinecone | null = null;
 
 export const getPineconeClient = async() => {
@@ -31,7 +32,7 @@ export async function loadS3IntoPinecone(fileKey : string){
 
     log("Loading s3 into fileSystem");
 
-    const file_name = await downlaodFromS3(fileKey);
+    const file_name = await downloadFromS3(fileKey);
     // we are extraxxting the text from the pdf using langchain
     if(!file_name){
         throw new Error("Error in downloading the file");
@@ -42,7 +43,21 @@ export async function loadS3IntoPinecone(fileKey : string){
     // 2.  split and segment the pdf into segments -> pages -> paragraphs -> sentences.
     const documents = await Promise.all(pages.map(prepareDocument)); // we are mapping over the pages and then preparing the document for each page
 
-    return pages ;
+    // 3. vectorize and embed individual documents
+
+    const vectors = await Promise.all(documents.flat().map(embedDocument)); // we are mapping over the documents and then embedding each document
+    console.log('Vectors',vectors);
+    // 4. upload the vectors to pinecone
+    const client = await getPineconeClient();
+    const pineconeIndex = await client.index('chat-pdf-analyzer')
+
+    console.log('Inserting vectors into pinecone');
+
+    // const namespaceText = convertToAscii(fileKey);
+    // const namespace =  pineconeIndex.namespace(namespaceText);
+    // await namespace.upsert(vectors); // we are inserting the vectors into pinecone
+
+    return documents[0];
 }
 
 async function embedDocument(doc : Document){
@@ -58,7 +73,7 @@ async function embedDocument(doc : Document){
                 pageNumber : doc.metadata.pageNumber
             }
 
-        } as Vector;
+        } as PineconeRecord;
 
     }
     catch(error){
