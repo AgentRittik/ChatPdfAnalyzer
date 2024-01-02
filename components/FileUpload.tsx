@@ -7,9 +7,11 @@ import React from 'react'
 import { useDropzone } from 'react-dropzone';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 
 const FileUpload = () => {
+    const router  = useRouter();
     // CREATING A MUTATUION - >IT HEKPS US TO HIT THE BACKEND API 
     const [uploading , setUploading] = React.useState(false); // we are using this to show the loading state of the file upload
     const {mutate} = useMutation({
@@ -42,9 +44,9 @@ const FileUpload = () => {
                 }
                 //now we have to create a chat in the backend
                 mutate(data ,{
-                    onSuccess : (data) => {
-                        console.log(data);
-                        toast.success("successfully created chat")
+                    onSuccess : ({chat_id}) => {
+                        toast.success('Chat created successfully');
+                        router.push(`/chat/${chat_id}`);
                     },
                     onError : (err) => {
                         toast.error('Error in creating chat')
