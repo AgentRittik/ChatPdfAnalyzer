@@ -6,6 +6,7 @@ import { chats } from '@/lib/db/schema';
 import { eq } from "drizzle-orm";
 import ChatSideBar from '@/components/ChatSideBar';
 import PDFViewer from '@/components/PDFViewer';
+import ChatComponent from '@/components/ChatComponent';
 type Props = {
     params : {
         chatId : string;
@@ -36,7 +37,7 @@ const ChatPage = async({params : {chatId}}: Props) => {
                     <PDFViewer pdf_url={currentChat?.pdfUrl || ''}/>
                 </div>
                 <div className='flex-[3] border-l-4 border-l-slate-200'>
-
+                    <ChatComponent chatId={parseInt(chatId)}/>
                 </div>
             </div>
         </div>

@@ -15,7 +15,6 @@ export const getPineconeClient = async() => {
             apiKey: process.env.PINECONE_API_KEY!,
             environment: process.env.PINECONE_ENVIRONMENT!,
         });
-
     }
     return pinecone;
 }
